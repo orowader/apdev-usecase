@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_76007d8e_c2e0_45e8_a081_0e22aaf12ec8_Output_Payload = {
+  Category: String, 
+  Price: Number, 
+  product_id: Number, 
+  product_name: String, 
+  order_id: Number, 
+  _?: Any
+}
+

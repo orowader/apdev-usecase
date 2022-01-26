@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_2bc23fc7_c865_40c6_9a02_0d1ae6c485a1_Input_Payload = {
+  Category: String, 
+  Price: Number, 
+  product_id: Number, 
+  product_name: String, 
+  order_id: Number, 
+  _?: Any
+}
+

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_8770f73a_9b4c_4ad9_aa1f_e0927a6ca5fe_Output_Variables_id = Number {"typeId": "int"}
+

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_b3da588a_0e92_4f8d_9f62_e5b0414ff985_Output_Payload = Array<{  Category: String,   Price: Number,   product_id: Number,   product_name: String,   order_id: Number,   _?: Any}>
+

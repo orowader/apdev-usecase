@@ -1,0 +1,6 @@
+%dw 2.0
+
+type auto_f2b8002a_2743_4c22_9ad2_2bef40c6f3c7_Output_Payload = Array<{  order_info: {    date: String,     customer_name: String,     order_id: Number,     _?: Any  },   order_items: Array<{    Category: String,     Price: Number,     product_id: Number,     product_name: String,     order_id: Number,     _?: Any  }>, 
+  _?: Any
+}>
+

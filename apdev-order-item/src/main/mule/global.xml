@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<configuration doc:name="Configuration" doc:id="4e1697aa-32eb-453b-9182-9789691287c8" defaultErrorHandler-ref="globalError_Handler" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="9901b5d3-1af5-4480-a2e6-a7bac5c67b3c" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="dpdtestemail@gmail.com" password="testserver" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<error-handler name="globalError_Handler" doc:id="0f1ea72e-2095-4eb5-b0a6-e76f1bafa668" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="56fd321c-950b-41ff-83fa-a0c14f6e219a" >
+			<ee:transform doc:name="error.description" doc:id="1834de66-d825-4338-b473-626bcfe4e6ee" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<email:send doc:name="Send" doc:id="4e4de481-8e19-437d-a809-140575392a6a" config-ref="Email_SMTP" fromAddress="testdpdemail@gmail.com" subject="Order Item Failed">
+				<email:to-addresses >
+					<email:to-address value="orowader@umich.edu" />
+				</email:to-addresses>
+			</email:send>
+		</on-error-propagate>
+	</error-handler>
+</mule>

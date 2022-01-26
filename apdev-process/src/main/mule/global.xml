@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<configuration doc:name="Configuration" doc:id="45714856-ade5-46f3-9c64-e6557e9ef877" defaultErrorHandler-ref="globalError_Handler" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="25633c9f-9a46-45fc-9b86-178980cfdcc1" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="testdpdemail@gmail.com" password="testserver" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<error-handler name="globalError_Handler" doc:id="34ecd0b1-326d-4fa4-8247-06fc1ff0caf6" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cce7a27b-adda-4992-a8b1-7b7ffc9cc1bb" type="ORDER-ITEMS-SYSTEM-API:INTERNAL_SERVER_ERROR, ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR">
+			<ee:transform doc:name="Transform Message" doc:id="78dba2c9-3aeb-4f62-947a-afca94b1595f">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<email:send doc:name="Send" doc:id="e8cea96e-016b-4a91-97b4-dde2eb7b9ef9" config-ref="Email_SMTP" fromAddress="testdpdemail@gmail.com" subject="Order Process API Failed">
+				<email:to-addresses >
+					<email:to-address value="orowader@umich.edu" />
+				</email:to-addresses>
+			</email:send>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2ebf113f-4001-468b-8ea4-a57b16d0cbbe" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="692cc541-bf9d-4cfa-b3c8-1a1c47dbcf52" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<email:send doc:name="Send" doc:id="18404707-8f0c-41c6-bd12-c3324454492a" config-ref="Email_SMTP" fromAddress="testdpdemail@gmail.com" subject="Order Process API Failed" >
+				<email:to-addresses >
+					<email:to-address value="orowader@umich.edu" />
+				</email:to-addresses>
+			</email:send>
+		</on-error-propagate>
+	</error-handler>
+</mule>

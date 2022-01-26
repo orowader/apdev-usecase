@@ -1,0 +1,14 @@
+[
+  {
+    "customer_name": "1",
+    "order_id": "2021-12-12",
+    "date": "nathan",
+    "order_items": "product_name:soup;product_id:1001;order_id:1;Category:food;Price:10;,product_name:legos;product_id:1001;order_id:1;Category:toys;Price:20;,product_name:blanket;product_id:1001;order_id:1;Category:bedroom;Price:40;,product_name:chicken;product_id:1001;order_id:1;Category:food;Price:15;,product_name:chicken;product_id:1001;order_id:1;Category:food;Price:15;"
+  },
+  {
+    "customer_name": "2",
+    "order_id": "2021-12-12",
+    "date": "dane",
+    "order_items": "product_name:blanket;product_id:1002;order_id:2;Category:bedroom;Price:40;,product_name:iphone;product_id:1002;order_id:2;Category:tech;Price:200;,product_name:oven;product_id:1002;order_id:2;Category:appliances;Price:300;,product_name:soup;product_id:1002;order_id:2;Category:food;Price:10;,product_name:soup;product_id:1002;order_id:2;Category:food;Price:10;"
+  }
+]

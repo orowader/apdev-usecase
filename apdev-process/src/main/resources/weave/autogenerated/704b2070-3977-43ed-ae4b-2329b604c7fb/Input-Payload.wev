@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_704b2070_3977_43ed_ae4b_2329b604c7fb_Input_Payload = {
+  order_info: {
+    date: String, 
+    customer_name: String, 
+    order_id: Number, 
+    _?: Any
+  }, 
+  order_items: Array<{    Category: String,     Price: Number,     product_id: Number,     product_name: String,     order_id: Number,     _?: Any  }>, 
+  _?: Any
+}
+
