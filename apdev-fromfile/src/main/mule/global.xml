@@ -8,6 +8,7 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 	<configuration doc:name="Configuration" doc:id="9e9b51d1-307e-4951-905f-1bb4773c852e" defaultErrorHandler-ref="globalError_Handler" />
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="5541a2dd-30f5-485a-bd01-92af24f25486" >
 		<email:smtp-connection host="smtp.gmail.com" port="587" user="testdpdemail@gmail.com" password="testserver" >
+			<pooling-profile />
 			<email:properties >
 				<email:property key="mail.smtp.starttls.enable" value="true" />
 			</email:properties>

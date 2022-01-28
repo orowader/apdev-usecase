@@ -12,8 +12,8 @@ http://www.mulesoft.org/schema/mule/orders-system-api http://www.mulesoft.org/sc
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a36e4b79-49c8-4748-a44e-f43dea3a3c48" >
 		<http:listener-connection host="0.0.0.0" port="8083" />
 	</http:listener-config>
-	<order-items-system-api:config name="Order_Items_System_API_Config" doc:name="Order Items System API Config" doc:id="6ab893f8-3ac3-42d5-bdc0-1075ce284038" property_host="127.0.0.1" property_port="8082" property_protocol="HTTP" property_basePath="/api/"/>
-	<orders-system-api:config name="Orders_System_API_Config" doc:name="Orders System API Config" doc:id="d36b557e-7391-4a57-ac5d-005fe8e8e3c4" property_host="127.0.0.1" property_port="8081" property_protocol="HTTP" property_basePath="/api/" />
+	<order-items-system-api:config name="Order_Items_System_API_Config" doc:name="Order Items System API Config" doc:id="6ab893f8-3ac3-42d5-bdc0-1075ce284038" property_host="127.0.0.1" property_port="8082" property_protocol="HTTP" property_basePath="/api/" property_responseTimeout="1000000"/>
+	<orders-system-api:config name="Orders_System_API_Config" doc:name="Orders System API Config" doc:id="d36b557e-7391-4a57-ac5d-005fe8e8e3c4" property_host="127.0.0.1" property_port="8081" property_protocol="HTTP" property_basePath="/api/" property_responseTimeout="1000000"/>
 	<flow name="getOrder_Items" doc:id="7554ffe4-25a3-4aaf-8638-91949aac3434" >
 		<scatter-gather doc:name="Scatter-Gather" doc:id="03846cf0-c165-4781-8a1d-3067359158ca" >
 			<route >

@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 	<configuration doc:name="Configuration" doc:id="4e1697aa-32eb-453b-9182-9789691287c8" defaultErrorHandler-ref="globalError_Handler" />
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="9901b5d3-1af5-4480-a2e6-a7bac5c67b3c" >
-		<email:smtp-connection host="smtp.gmail.com" port="587" user="dpdtestemail@gmail.com" password="testserver" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="testdpdemail@gmail.com" password="testserver" >
 			<email:properties >
 				<email:property key="mail.smtp.starttls.enable" value="true" />
 			</email:properties>
