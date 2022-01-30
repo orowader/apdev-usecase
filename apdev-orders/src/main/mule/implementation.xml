@@ -6,22 +6,194 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6599fa90-55e3-4ecc-9a98-397cdd9b1d23" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
-	</http:listener-config>
-	<db:config name="Database_Config" doc:name="Database Config" doc:id="5633f833-a631-4928-b7bc-6c1d47b9833e" >
-		<db:my-sql-connection host="127.0.0.1" port="3306" user="root" database="orders" />
-	</db:config>
-	<db:config name="Database_Config1" doc:name="Database Config" doc:id="f3cbbd29-5320-460a-8a43-3020c6470f9f" >
-		<db:my-sql-connection host="127.0.0.1" port="3306" user="root" database="orders" />
-	</db:config>
-	<db:config name="Database_Config2" doc:name="Database Config" doc:id="c7deb460-2c97-49e3-845f-e31018ebda48" >
-		<db:my-sql-connection host="127.0.0.1" port="3306" user="root" database="orders" />
-	</db:config>
+		<flow name="getOrderItems" doc:id="d7203f96-6e79-4f69-b6de-fd37e3242808" >
+		<db:select doc:name="Select" doc:id="e01ebf22-d6fb-4220-a4f8-d30dcd94ce42" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[SELECT * FROM orderitems]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="6d7245f5-42d6-4211-bb65-dcf399e94045" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ca8b52ee-8028-4051-a3dc-35b4d830a017" message="#[payload]"/>
+	</flow>
+	<flow name="getOrderIDItems" doc:id="4e738900-9946-4ce9-a4a4-031cd7269e8e" >
+		<db:select doc:name="Select" doc:id="7f65b3fb-37e2-479f-aaea-7085c20ff047" config-ref="Database_Config_global" >
+			<db:sql ><![CDATA[SELECT * FROM orderitems WHERE 	order_id = :id ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="5ac62461-09f4-42d7-be40-9029ce7bd1c1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2258da52-f7c0-456b-8f6e-e99df4f37fef" message="#[payload]"/>
+	</flow>
+	<flow name="getOrderItemID" doc:id="8bf0bb13-ca1c-4af8-b5ac-fb700217e250" >
+		<db:select doc:name="Select" doc:id="c79baf10-22d2-4d17-b353-e91fb8e8cd83" config-ref="Database_Config_global" >
+			<db:sql ><![CDATA[SELECT * FROM orderitems WHERE 	product_id = :id ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0ca37e11-a5a1-4a58-a936-5900acd2fab4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b02c6709-b642-494f-9df1-9d53cec4348f" message="#[payload]"/>
+	</flow>
+	<flow name="deleteOrderItemID" doc:id="df4a8f92-a3c0-4042-9d37-510633f37e76" >
+		<db:delete doc:name="Delete" doc:id="f3fd1840-30f2-4ad2-8ac2-bbfc4e5d49cd" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[DELETE FROM orderitems WHERE product_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="5699dcd9-7a87-4437-bdf0-784328ad5b34" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Order Item Deleted."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="0f6308be-0e3b-45d2-bba9-af120e49ca49" message="#[payload]"/>
+	</flow>
+	<flow name="deleteOrderIDItems" doc:id="3219a13e-d342-4f09-8ae4-42b61750bd19" >
+		<db:delete doc:name="Delete" doc:id="7638a585-0ae2-4820-9dd5-54980ee30648" config-ref="Database_Config_global" >
+			<db:sql ><![CDATA[DELETE FROM orderitems WHERE order_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="cd66a559-df78-4349-bda4-9785afa16a0a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Order Items Deleted."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="07376660-d51b-4f59-8a0d-231310672a90" message="#[payload]"/>
+	</flow>
+	<flow name="postOrderItems" doc:id="a9a988e9-7294-4b3c-97bc-d9f24aff5e42" >
+		<db:insert doc:name="Insert" doc:id="ae69ce56-f109-4d62-be51-86730264cbfc" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[INSERT INTO `orderitems`(`product_name`, `product_id`, `order_id`, `Category`, `Price`) 
+VALUES (:name,:id,:oid,:cat,:price)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{name: payload.product_name, id: payload.product_id, oid: payload.order_id, 
+cat: payload.Category, price: payload.Price}] ]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="0f1aac2a-28b0-4f94-87dd-d10b649b2baa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Item Added."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bc41ebb9-3933-47dd-bb1b-bfe82a97ad42" message="#[payload]"/>
+	</flow>
+	<flow name="postAllItems" doc:id="a84a1857-a40b-4495-a551-b5b37eec9656" >
+		<db:bulk-insert doc:name="Bulk insert" doc:id="db7c7e0c-390b-4d17-b282-7fbbc6839967" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[INSERT INTO `orderitems`(`product_name`, `product_id`, `order_id`, `Category`, `Price`) 
+VALUES (:product_name,:product_id,:order_id,:Category,:Price)]]></db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Transform Message" doc:id="17b99d58-ea33-42af-bc0b-f30bbc8f134d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Items Added."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="96da44f2-b216-4a71-9b63-1fdb4667f435" message="#[payload]" />
+	</flow>
+	<flow name="putAllItems" doc:id="c5b77530-07e9-4373-860a-afa8a914393d" >
+		<db:bulk-update doc:name="Bulk update" doc:id="660b4e26-ed05-4c13-b127-98acce364b5a" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[UPDATE `orderitems` SET `product_name`=:product_name,
+`product_id`=:product_id,`order_id`=:order_id,`Category`= :Category,
+`Price`= :Price WHERE product_id = :product_id]]></db:sql>
+		</db:bulk-update>
+		<ee:transform doc:name="Transform Message" doc:id="900264e6-2db6-4e5d-8342-a031e220f6c6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Items Appended."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="a3defb6f-4e18-4303-8e4e-21034ad6596b" message="#[payload]" />
+	</flow>
+	<flow name="putOrderItems" doc:id="d99c5578-99c0-4b3d-bb44-270dbfbcccd8" >
+		<set-variable value="#[payload.product_name]" doc:name="Set Variable" doc:id="d443a483-fffa-498c-ab28-c77929f3047e" variableName="product_name"/>
+		<set-variable value="#[payload.product_id]" doc:name="Set Variable" doc:id="83dbeb62-3c8f-465b-8d20-fb6e416e61a2" variableName="product_id"/>
+		<set-variable value="#[payload.order_id]" doc:name="Set Variable" doc:id="52213159-149a-41d2-94d6-9c5c1bcd8098" variableName="order_id"/>
+		<set-variable value="#[payload.Category]" doc:name="Set Variable" doc:id="32359b03-9694-4349-a230-46b5ca330ec2" variableName="Category"/>
+		<set-variable value="#[payload.Price]" doc:name="Set Variable" doc:id="03505a48-eff1-4150-99d7-8ae7ce31fe9d" variableName="Price"/>
+		<db:select doc:name="Select" doc:id="a10f5a96-f427-497c-9ec5-2361d77f3631" config-ref="Database_Config_global">
+			<db:sql ><![CDATA[SELECT * FROM orderitems WHERE product_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[id: payload.product_id] ]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="966a8c9f-8460-4326-8f8a-a05f8340edfb" >
+			<when expression="#[(sizeOf(payload) == 0)]">
+				<db:insert doc:name="Insert" doc:id="0da32f2b-9f67-40e0-92a7-441b8f3b5140" config-ref="Database_Config_global">
+					<db:sql ><![CDATA[INSERT INTO `orderitems`(`product_name`, `product_id`, `order_id`, `Category`, `Price`) 
+VALUES (:name,:id,:oid,:cat,:price)]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{name: vars.product_name, id: vars.product_id, oid: vars.order_id, 
+cat: vars.Category, price: vars.Price}] ]]></db:input-parameters>
+				</db:insert>
+				<ee:transform doc:name="Transform Message" doc:id="9c5adb9c-2847-4fc7-b38b-9321c7a6b88f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Item Added."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="42add14d-8159-46c6-87e5-3953de8c2a91" message="#[payload]"/>
+			</when>
+			<otherwise >
+				<db:update doc:name="Update" doc:id="b479a8e3-cc71-497d-821f-806b6f6bde54" config-ref="Database_Config_global">
+					<db:sql ><![CDATA[UPDATE `orderitems` SET `product_name`=:name,
+`product_id`=:id,`order_id`=:oid,`Category`= :cat,
+`Price`= :price WHERE product_id = :id]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{name: vars.product_name, id: vars.product_id, oid: vars.order_id, 
+cat: vars.Category, price: vars.Price}] ]]></db:input-parameters>
+				</db:update>
+				<ee:transform doc:name="Transform Message" doc:id="dc8afa46-c972-4db2-8cb9-3f9bfe8566cb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Order Adjusted."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="392b3fe6-69c9-4118-bc1f-e4044f2638d9" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
 	<flow name="postOrders" doc:id="9ccbb86a-fb55-440c-80e3-74acca3e06c5" >
 		<choice doc:name="Choice" doc:id="da4cf402-1b9d-4e19-be41-44bc429e13dc" >
 			<when expression="#[attributes.uriParams.ID ~= payload.order_id]">
-				<db:insert doc:name="Insert" doc:id="186ef5a0-c2d0-4cef-89a0-22336917e4a8" config-ref="Database_Config2">
+				<db:insert doc:name="Insert" doc:id="186ef5a0-c2d0-4cef-89a0-22336917e4a8" config-ref="Database_Config_global">
 			<db:sql><![CDATA[INSERT INTO orders(order_id,customer_name, date)
 VALUES (:id, :name, :date) ]]></db:sql>
 			<db:input-parameters><![CDATA[#[{id: payload.order_id, name: payload.customer_name, date: payload.date}] ]]></db:input-parameters>
@@ -54,7 +226,7 @@ output application/json
 		<logger level="INFO" doc:name="Logger" doc:id="a489b346-31d0-4638-a61e-cf3a57a096b0" message="#[payload]"/>
 	</flow>
 	<flow name="deleteOrders" doc:id="2d7d5e61-b8cd-4a2b-8132-4e3f50c85383" >
-		<db:delete doc:name="deleteOrders" doc:id="f7aa3123-9933-4e6a-8756-776b42a4358f" config-ref="Database_Config1">
+		<db:delete doc:name="deleteOrders" doc:id="f7aa3123-9933-4e6a-8756-776b42a4358f" config-ref="Database_Config_global">
 			<db:sql ><![CDATA[DELETE FROM `orders` WHERE `order_id` = :id]]></db:sql>
 			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
 		</db:delete>
@@ -71,7 +243,7 @@ output application/json
 		<logger level="INFO" doc:name="Logger" doc:id="95f2f62d-f3be-4791-919d-f745f4b4c171" />
 	</flow>
 	<flow name="getOrders" doc:id="3649a159-cfa1-40a8-953e-70b10c121a53" >
-		<db:select doc:name="Select" doc:id="76a4d91a-b18c-4b62-a6ce-80f038ccace4" config-ref="Database_Config1">
+		<db:select doc:name="Select" doc:id="76a4d91a-b18c-4b62-a6ce-80f038ccace4" config-ref="Database_Config_global">
 			<db:sql ><![CDATA[SELECT * FROM `orders`]]></db:sql>
 		</db:select>
 		<ee:transform doc:name="Transform Message" doc:id="ff8d12d5-6651-4edd-b107-8fce485d2275" >
@@ -85,7 +257,7 @@ payload]]></ee:set-payload>
 		<logger level="INFO" doc:name="Logger" doc:id="8d41ca57-9c91-403d-8c59-88bc6bc09bf8" message="#[payload]"/>
 	</flow>
 	<flow name="getOrdersID" doc:id="7dd2c709-1a22-437c-adde-2dccb170fdc6" >
-		<db:select doc:name="Select" doc:id="a8667eb1-99a9-41a3-9457-a8f7938566bf" config-ref="Database_Config2">
+		<db:select doc:name="Select" doc:id="a8667eb1-99a9-41a3-9457-a8f7938566bf" config-ref="Database_Config_global">
 			<db:sql ><![CDATA[SELECT * FROM orders WHERE order_id = :id]]></db:sql>
 			<db:input-parameters ><![CDATA[#[id: attributes.uriParams.ID]]]></db:input-parameters>
 		</db:select>
@@ -104,13 +276,13 @@ payload]]></ee:set-payload>
 		<set-variable value="#[payload.order_id]" doc:name="SetID" doc:id="04341684-0989-4759-8cd0-22fa37d63c85" variableName="id"/>
 		<set-variable value="#[payload.date]" doc:name="setDate" doc:id="61342dde-6ac7-4805-93fa-8bb6cc534f1f" variableName="date"/>
 		<set-variable value="#[payload.customer_name]" doc:name="SetName" doc:id="2a58db65-7868-4cb5-8c70-8a9469f3a71e" variableName="name"/>
-		<db:select doc:name="Select" doc:id="adb42c74-a863-440c-86cb-32c2ab007fff" config-ref="Database_Config1">
+		<db:select doc:name="Select" doc:id="adb42c74-a863-440c-86cb-32c2ab007fff" config-ref="Database_Config_global">
 			<db:sql ><![CDATA[SELECT * FROM orders WHERE order_id = :id]]></db:sql>
 			<db:input-parameters ><![CDATA[#[id: payload.order_id]]]></db:input-parameters>
 		</db:select>
 		<choice doc:name="Copy_of_Choice" doc:id="fab0d276-59b0-4a4c-9822-c7df046521c2">
 			<when expression="#[(sizeOf(payload) == 0) and (vars.uri_id ~= vars.id)]">
-				<db:insert doc:name="Copy_of_Insert" doc:id="648dc09a-a89a-46a4-970a-60cdc59cf44f" config-ref="Database_Config2">
+				<db:insert doc:name="Copy_of_Insert" doc:id="648dc09a-a89a-46a4-970a-60cdc59cf44f" config-ref="Database_Config_global">
 					<db:sql><![CDATA[INSERT INTO orders(order_id,customer_name, date)
 VALUES (:id, :name, :date) ]]></db:sql>
 					<db:input-parameters><![CDATA[#[{id: vars.id, name: vars.name, date: vars.date}] ]]></db:input-parameters>
@@ -127,11 +299,12 @@ output application/json
 				</ee:transform>
 			</when>
 			<when expression="(vars.uri_id ~= vars.id)">
-				<db:update doc:name="Update" doc:id="aaf242f5-b077-483c-946b-3c506b78c2d3" config-ref="Database_Config1">
+				<db:update doc:name="Update" doc:id="aaf242f5-b077-483c-946b-3c506b78c2d3" config-ref="Database_Config_global">
 					<db:sql><![CDATA[UPDATE `orders` SET `customer_name`= :name, date = :date WHERE order_id = :id]]></db:sql>
 					<db:input-parameters><![CDATA[#[{name: vars.name, id: vars.id, date: vars.date}] ]]></db:input-parameters>
 				</db:update>
-				<ee:transform doc:name="Copy_of_Transform Message" doc:id="cd3e2651-a149-46e4-b717-9faf99eca29b" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="cd3e2651-a149-46e4-b717-9faf99eca29b" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-    <apikit:config name="orders-system-api-config" api="resource::de9a7ce5-d043-4057-a3c0-5e725e56e502:orders-system-api:1.0.5:raml:zip:orders-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <flow name="orders-system-api-main">
-        <http:listener path="/api/*" config-ref="HTTP_Listener_orders">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <apikit:config name="order-items-system-api-config" api="resource::de9a7ce5-d043-4057-a3c0-5e725e56e502:order-items-system-api:1.0.6:raml:zip:order-items-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="order-items-system-api-main">
+        <http:listener path="/api/*" config-ref="HTTP_Listener_config1">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -11,7 +11,7 @@
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="orders-system-api-config" />
+        <apikit:router config-ref="order-items-system-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
@@ -93,8 +93,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="orders-system-api-console">
-        <http:listener path="/console/*" config-ref="HTTP_Listener_orders">
+    <flow name="order-items-system-api-console">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config1">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -103,10 +103,10 @@ output application/json
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="orders-system-api-config" />
+        <apikit:console config-ref="order-items-system-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                <ee:transform xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -120,19 +120,31 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\orders\(ID):application\json:orders-system-api-config">
-        <flow-ref doc:name="putOrders" doc:id="c8b3d06f-bc2e-401e-ab7f-7679f547619b" name="putOrders" />
+    <flow name="put:\orderitems:application\json:order-items-system-api-config">
+        <flow-ref doc:name="putOrderItems" doc:id="784550e5-9697-4012-9c7b-d955dc9c9ec4" name="putOrderItems" />
     </flow>
-    <flow name="delete:\orders\(ID):application\json:orders-system-api-config">
-        <flow-ref doc:name="deleteOrders" doc:id="8df3b674-bcdf-4187-82b7-651333cd6d01" name="deleteOrders" />
+    <flow name="delete:\orderitems\allitems\(ID):order-items-system-api-config">
+        <flow-ref doc:name="deleteOrderIDItems" doc:id="348a2d17-0517-4948-a2cd-38fa05138dd8" name="deleteOrderIDItems" />
     </flow>
-    <flow name="get:\orders:orders-system-api-config">
-        <flow-ref doc:name="getOrders" doc:id="6dfccf48-c097-4b22-bb05-5bb33f111ecd" name="getOrders" />
+    <flow name="delete:\orderitems\(ID):order-items-system-api-config">
+        <flow-ref doc:name="deleteOrderItemID" doc:id="d1d6fdad-3505-4b1c-a200-6a85a357dd25" name="deleteOrderItemID" />
     </flow>
-    <flow name="get:\orders\(ID):orders-system-api-config">
-        <flow-ref doc:name="getOrdersID" doc:id="e8304aee-9c36-4cfa-b49b-0862b7aca7a8" name="getOrdersID" />
+    <flow name="get:\orderitems:order-items-system-api-config">
+        <flow-ref doc:name="getOrderItems" doc:id="11af5935-ed4f-4f4f-b4d2-da7f83382920" name="getOrderItems" />
     </flow>
-    <flow name="post:\orders\(ID):application\json:orders-system-api-config">
-        <flow-ref doc:name="postOrders" doc:id="e77837ec-12b8-4c8a-b418-a2cbf2dc5bd8" name="postOrders" />
+    <flow name="get:\orderitems\allitems\(ID):order-items-system-api-config">
+        <flow-ref doc:name="getOrderIDItems" doc:id="15238418-3c4b-4dcc-911a-34506f3bf044" name="getOrderIDItems" />
+    </flow>
+    <flow name="get:\orderitems\(ID):order-items-system-api-config">
+        <flow-ref doc:name="getOrderItemID" doc:id="9fe03b57-937e-4a99-9542-901d7fe534f2" name="getOrderItemID" />
+    </flow>
+    <flow name="post:\orderitems:application\json:order-items-system-api-config">
+        <flow-ref doc:name="postOrderItems" doc:id="cdef5773-4898-491d-ae2f-263a868d3ee1" name="postOrderItems" />
+    </flow>
+    <flow name="put:\orderitems\allitems:application\json:order-items-system-api-config">
+		<flow-ref doc:name="putAllItems" doc:id="22025fbe-71dd-48cf-bf93-18bbd0b71717" name="putAllItems"/>
+    </flow>
+    <flow name="post:\orderitems\allitems:application\json:order-items-system-api-config">
+		<flow-ref doc:name="postAllItems" doc:id="ba22d3b5-c5c4-4741-9f3e-d1838dd4d21d" name="postAllItems"/>
     </flow>
 </mule>

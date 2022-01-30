@@ -8,17 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/orders-process-api http://www.mulesoft.org/schema/mule/orders-process-api/current/mule-orders-process-api.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
-	<file:config name="File_Config" doc:name="File Config" doc:id="fc2fae24-1920-411f-b2fe-bd95bc2ff3f4" >
-		<file:connection workingDir="C:\Users\orowa\Desktop\csv" />
-	</file:config>
-	<orders-process-api:config name="Orders_Process_API_Config" doc:name="Orders Process API Config" doc:id="dce71d47-3118-4846-9448-e3643032236a" property_host="127.0.0.1" property_port="8083" property_protocol="HTTP" property_client-id="faf816533d73478cbb62430f1b8f8fbc" property_client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305" property_basePath="/api/" property_responseTimeout="1000000"/>
-	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="b9a30225-c4e6-4049-87ca-0f83e53dc12d" >
-		<email:smtp-connection host="smtp.gmail.com" port="587" user="testdpdemail@gmail.com" password="testserver" >
-			<email:properties >
-				<email:property key="mail.smtp.starttls.enable" value="true" />
-			</email:properties>
-		</email:smtp-connection>
-	</email:smtp-config>
+	<orders-process-api:config name="Orders_Process_API_Config" doc:name="Orders Process API Config" doc:id="dce71d47-3118-4846-9448-e3643032236a" property_host="${http.process_config.host}" property_port="${http.process_config.port}" property_protocol="${http.process_config.protocol}" property_client-id="${http.process_config.client_id}" property_client-secret="${http.process_config.client_secret}" property_basePath="${http.process_config.basepath}" property_responseTimeout="${http.process_config.timeout}" property_access-token-url="${http.process_config.token_url}"/>
 	<flow name="postCSVOrders" doc:id="92bbf6d9-5a11-444e-8f20-b7b583040545" >
 		<ee:transform doc:name="Transform Message" doc:id="577d545b-f1ba-4aca-87ac-4fff5821afce">
 			<ee:message>
@@ -50,30 +40,37 @@ payload map (object, index) -> {
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="834dd62a-4f8e-4e36-8190-3f8adaf7bc46" >
-			<ee:transform doc:name="Transform Message" doc:id="c3c35582-a420-4b1f-9799-8f59a3d870b0">
+		<batch:job jobName="CSV_Batch_Job" doc:id="28e16c79-0541-42d0-9903-8765267fe75a" blockSize="10">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="12e71d9b-2381-4d3d-a1ed-8178d9b4f05f" >
+					<ee:transform doc:name="Transform Message" doc:id="c3c35582-a420-4b1f-9799-8f59a3d870b0">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
-				<ee:set-variable variableName="current_order"><![CDATA[%dw 2.0
+							<ee:set-variable variableName="order_status"><![CDATA[%dw 2.0
 output application/json
 ---
-[]]]></ee:set-variable>
+payload]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-			<ee:transform doc:name="Transform Message" doc:id="1d9fa683-9af1-4171-aa87-7c74cfc9abb4">
-				<ee:message>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="current_order"><![CDATA[%dw 2.0
-output application/json
----
-vars.current_order + payload 
-]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-			<orders-process-api:create-order doc:name="Create order" doc:id="efd786de-f9f2-499b-8fbc-84d89b1386b2" config-ref="Orders_Process_API_Config" />
-		</foreach>
+					<orders-process-api:create-order doc:name="Create order" doc:id="efd786de-f9f2-499b-8fbc-84d89b1386b2" config-ref="Orders_Process_API_Config" />
+				</batch:step>
+				<batch:step name="Batch_Step1" doc:id="b7a5b0f8-2d3e-4cb4-8c9e-4f0e6f4f2ea2" acceptPolicy="ONLY_FAILURES">
+					<email:send doc:name="Fail_Send" doc:id="0b07a087-2456-40c3-a854-ad01bca2b993" fromAddress="testdpdemail@gamil.com" subject="Record Failed " config-ref="Email_SMTP1">
+					<email:to-addresses>
+						<email:to-address value="orowader@umich.edu" />
+					</email:to-addresses>
+					<email:body>
+						<email:content><![CDATA[#[vars.current_order]]]></email:content>
+					</email:body>
+				</email:send>
+					<logger level="INFO" doc:name="Logger" doc:id="f67e805b-d44d-44bf-acf3-3c7d5f79539d"/>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="f39cd2ae-ce64-4b45-84d8-7bf8b6fbc70a" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
 		<ee:transform doc:name="Transform Message" doc:id="82b34a49-d5b2-4ef5-926d-dfd128f148cf" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -81,55 +78,11 @@ output application/json
 
 ---
 {
-	"message": "All files successfully uploaded."
+	"message": "Records Processed."
 }
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="0eb56da4-9927-47fa-8cfb-91de097b3936" message="#[payload]"/>
-		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0c95e4bd-7d30-441f-96d0-34c53bec2ea0" type="ORDERS-PROCESS-API:INTERNAL_SERVER_ERROR">
-				<ee:transform doc:name="Transform Message" doc:id="3f1bc8e7-7144-4dc3-98dd-b71fd15da161" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"message": "500 Error. An order_id or product_id may already be in the database. Orders up until below order were processed.",
-	"order": vars.current_order
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<email:send doc:name="Send" doc:id="c335745f-bde3-4bfb-9fe7-b8bf85826968" config-ref="Email_SMTP" fromAddress="testdpdemail@gamil.com" subject="Upload Failure ">
-					<email:to-addresses >
-						<email:to-address value="orowader@umich.edu" />
-					</email:to-addresses>
-					<email:body >
-						<email:content ><![CDATA[Your CSV Upload Failed]]></email:content>
-					</email:body>
-				</email:send>
-			</on-error-propagate>
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9faeed20-c381-4a10-82e8-9e26f410125a" type="ORDERS-PROCESS-API:CONNECTIVITY">
-				<ee:transform doc:name="Transform Message" doc:id="d869e996-d2d2-42b8-9c2f-f936abb02c36" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"message": "couldn't connect"
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<email:send doc:name="Send" doc:id="475fb3b3-73c3-4d11-b7ae-a79a3d776ef3" config-ref="Email_SMTP" fromAddress="testdpdemail@gamil.com" subject="Upload Failure " >
-					<email:to-addresses >
-						<email:to-address value="orowader@umich.edu" />
-					</email:to-addresses>
-					<email:cc-addresses />
-					<email:body >
-						<email:content ><![CDATA[Your CSV Upload Failed]]></email:content>
-					</email:body>
-				</email:send>
-			</on-error-propagate>
-		</error-handler>
 	</flow>
 </mule>

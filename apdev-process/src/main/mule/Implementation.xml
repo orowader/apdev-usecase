@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
-	xmlns:orders-system-api="http://www.mulesoft.org/schema/mule/orders-system-api" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:order-items-system-api="http://www.mulesoft.org/schema/mule/order-items-system-api"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:orders-system-api="http://www.mulesoft.org/schema/mule/orders-system-api"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:order-items-system-api="http://www.mulesoft.org/schema/mule/order-items-system-api" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/order-items-system-api http://www.mulesoft.org/schema/mule/order-items-system-api/current/mule-order-items-system-api.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/orders-system-api http://www.mulesoft.org/schema/mule/orders-system-api/current/mule-orders-system-api.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a36e4b79-49c8-4748-a44e-f43dea3a3c48" >
-		<http:listener-connection host="0.0.0.0" port="8083" />
-	</http:listener-config>
-	<order-items-system-api:config name="Order_Items_System_API_Config" doc:name="Order Items System API Config" doc:id="6ab893f8-3ac3-42d5-bdc0-1075ce284038" property_host="127.0.0.1" property_port="8082" property_protocol="HTTP" property_basePath="/api/" property_responseTimeout="1000000"/>
-	<orders-system-api:config name="Orders_System_API_Config" doc:name="Orders System API Config" doc:id="d36b557e-7391-4a57-ac5d-005fe8e8e3c4" property_host="127.0.0.1" property_port="8081" property_protocol="HTTP" property_basePath="/api/" property_responseTimeout="1000000"/>
+http://www.mulesoft.org/schema/mule/orders-system-api http://www.mulesoft.org/schema/mule/orders-system-api/current/mule-orders-system-api.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<order-items-system-api:config name="Order_Items_System_API_Config" doc:name="Order Items System API Config" doc:id="6ab893f8-3ac3-42d5-bdc0-1075ce284038" property_host="${http.order_item_config.host} " property_port="${http.order_item_config.port} " property_protocol="${http.order_item_config.protocol} " property_basePath="${http.order_item_config.basepath} " property_responseTimeout="${http.order_item_config.timeout} "/>
+	<orders-system-api:config name="Orders_System_API_Config" doc:name="Orders System API Config" doc:id="d36b557e-7391-4a57-ac5d-005fe8e8e3c4" property_host="${http.orders_config.host}" property_port="${http.orders_config.port}" property_protocol="${http.orders_config.protocol}" property_basePath="${http.orders_config.basepath}" property_responseTimeout="${http.orders_config.timeout}"/>
 	<flow name="getOrder_Items" doc:id="7554ffe4-25a3-4aaf-8638-91949aac3434" >
 		<scatter-gather doc:name="Scatter-Gather" doc:id="03846cf0-c165-4781-8a1d-3067359158ca" >
 			<route >
-				<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="dee45899-01c7-48e8-9eb9-59538bf902a3" config-ref="Orders_System_API_Config" id="#[attributes.uriParams.ID]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f"/>
+				<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="dee45899-01c7-48e8-9eb9-59538bf902a3" config-ref="Orders_System_API_Config" id="#[attributes.uriParams.ID]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}"/>
 				<ee:transform doc:name="Transform Message" doc:id="b53c733a-4d0a-4cda-b11a-1fdcbffcae2d">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
@@ -35,7 +33,7 @@ output application/json
 				</ee:transform>
 			</route>
 			<route >
-				<order-items-system-api:get-allitem-by-id doc:name="Get allitem by id" doc:id="fe5c38ed-39d9-4e82-af0b-f9e2fb59f894" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.ID]" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305"/>
+				<order-items-system-api:get-allitem-by-id doc:name="Get allitem by id" doc:id="fe5c38ed-39d9-4e82-af0b-f9e2fb59f894" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.ID]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 				<ee:transform doc:name="Transform Message" doc:id="185e8dd8-658e-48d2-8dd0-1abfd1337671">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
@@ -59,7 +57,7 @@ flatten(payload..payload)]]></ee:set-payload>
 		<logger level="INFO" doc:name="Logger" doc:id="f724ace6-54d3-4181-8d26-6678270c7f1d" message="#[payload]"/>
 	</flow>
 	<flow name="getOrder" doc:id="f2b8002a-2743-4c22-9ad2-2bef40c6f3c7" >
-		<orders-system-api:get-orders doc:name="Get orders" doc:id="729b1c8d-15c7-4fd2-92ed-19a3831c0847" config-ref="Orders_System_API_Config" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f"/>
+		<orders-system-api:get-orders doc:name="Get orders" doc:id="729b1c8d-15c7-4fd2-92ed-19a3831c0847" config-ref="Orders_System_API_Config" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}"/>
 		<ee:transform doc:name="Transform Message" doc:id="f6139a32-db1a-4604-bdad-6b38f0c8d193" >
 			<ee:message >
 			</ee:message>
@@ -73,7 +71,7 @@ output application/json
 		<foreach doc:name="For Each" doc:id="844fd1c5-661f-4b70-9421-75cca5906100" >
 			<scatter-gather doc:name="Scatter-Gather" doc:id="eee02089-547b-433b-bfee-8449b5fe3071" >
 				<route >
-					<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="7a849e5b-695b-4d72-b0e3-fd595aa99bdd" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f" />
+					<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="7a849e5b-695b-4d72-b0e3-fd595aa99bdd" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}" />
 					<ee:transform doc:name="Transform Message" doc:id="ea7f14df-64e3-4f82-92f0-90bdf8517e69" >
 						<ee:message >
 							<ee:set-payload ><![CDATA[%dw 2.0
@@ -91,7 +89,7 @@ output application/json
 					</ee:transform>
 				</route>
 				<route >
-					<order-items-system-api:get-allitem-by-id doc:name="Get allitem by id" doc:id="2e3d0ccf-982a-4714-a008-09a30adde065" config-ref="Order_Items_System_API_Config" id="#[payload.order_id]" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305" />
+					<order-items-system-api:get-allitem-by-id doc:name="Get allitem by id" doc:id="2e3d0ccf-982a-4714-a008-09a30adde065" config-ref="Order_Items_System_API_Config" id="#[payload.order_id]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}" />
 					<ee:transform doc:name="Transform Message" doc:id="35707f7b-e32b-49b7-ac85-f4b09f67cc06" >
 						<ee:message >
 							<ee:set-payload ><![CDATA[%dw 2.0
@@ -156,14 +154,13 @@ output application/json
 payload.order_items]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="c12c792f-7bcf-48ad-bf6c-733b1d3ebb9c" >
-			<try doc:name="Try" doc:id="a0c5b62f-b27c-458b-a3e5-0d4794f400db" >
-				<order-items-system-api:create-orderitem doc:name="Create orderitem" doc:id="856659c5-62bb-4116-a021-5ac23e9efc60" config-ref="Order_Items_System_API_Config" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305" />
-				<error-handler >
+		<try doc:name="Try" doc:id="a0c5b62f-b27c-458b-a3e5-0d4794f400db">
+				<order-items-system-api:create-allitem doc:name="Create allitem" doc:id="b6a333c4-f252-40b8-bf21-51371ce57326" config-ref="Order_Items_System_API_Config" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
+				<error-handler>
 					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6ecaa890-9cb0-4460-bc5e-360cc7fa0305" type="ORDER-ITEMS-SYSTEM-API:INTERNAL_SERVER_ERROR">
-						<ee:transform doc:name="Transform Message" doc:id="2292ab00-a472-4331-a09d-fc7813146eb7" >
-							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
+						<ee:transform doc:name="Transform Message" doc:id="2292ab00-a472-4331-a09d-fc7813146eb7">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
@@ -174,7 +171,6 @@ output application/json
 					</on-error-propagate>
 				</error-handler>
 			</try>
-		</foreach>
 		<ee:transform doc:name="Transform Message" doc:id="932b91d2-00df-4400-bdbe-a06125b1b499" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -184,7 +180,7 @@ vars.order_info.order_info]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<try doc:name="Try" doc:id="f4cfa069-7926-4fb3-ad00-890b4815b00f" >
-			<orders-system-api:create-order-by-id doc:name="Create order by id" doc:id="0937a105-f681-4150-9f43-15620ad05296" config-ref="Orders_System_API_Config" id="#[vars.order_info.order_info.order_id]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f" />
+			<orders-system-api:create-order-by-id doc:name="Create order by id" doc:id="0937a105-f681-4150-9f43-15620ad05296" config-ref="Orders_System_API_Config" id="#[vars.order_info.order_info.order_id]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}" />
 			<error-handler >
 				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e3d8ff52-32f6-4902-b083-2c767544824a" type="ORDERS-SYSTEM-API:INTERNAL_SERVER_ERROR">
 					<ee:transform doc:name="Transform Message" doc:id="70ace1b8-de70-437b-a2b4-121fdfff5d3e" >
@@ -223,7 +219,7 @@ output application/json
 payload]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="4d6197cf-50f9-4795-ac96-d5c28c34c88b" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f"/>
+		<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="4d6197cf-50f9-4795-ac96-d5c28c34c88b" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}"/>
 		<choice doc:name="Choice" doc:id="97aa46aa-66f7-48a8-9489-a212734bc090" >
 			<when expression="#[sizeOf(payload) == 0]">
 				<ee:transform doc:name="Transform Message" doc:id="98e057ad-d898-46e4-8ee3-8bdb72afa9a3" >
@@ -239,7 +235,7 @@ output application/json
 				<logger level="INFO" doc:name="Logger" doc:id="b85d6b47-a598-464a-9865-c744505f7d0a" message="#[payload]"/>
 			</when>
 			<otherwise >
-				<order-items-system-api:create-orderitem doc:name="Create orderitem" doc:id="c8e39edd-7954-4b16-a296-0f5e4bcfed0b" config-ref="Order_Items_System_API_Config" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305">
+				<order-items-system-api:create-orderitem doc:name="Create orderitem" doc:id="c8e39edd-7954-4b16-a296-0f5e4bcfed0b" config-ref="Order_Items_System_API_Config" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}">
 					<order-items-system-api:create-orderitem-request-data ><![CDATA[#[vars.item]]]></order-items-system-api:create-orderitem-request-data>
 				</order-items-system-api:create-orderitem>
 				<ee:transform doc:name="Transform Message" doc:id="309409b1-8f45-47a9-a5bc-239c898f206e" >
@@ -259,10 +255,10 @@ output application/json
 	<flow name="deleteOrder" doc:id="12295fb2-a8d5-4675-8653-d6ff737a1dd7" >
 		<scatter-gather doc:name="Scatter-Gather" doc:id="65cd1ac6-692a-4bdf-8a3f-571d494d9bf2" >
 			<route >
-				<order-items-system-api:delete-allitem-by-id doc:name="Delete allitem by id" doc:id="b01c03c3-ad90-4f72-bd85-a437ee7c337c" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.ID]" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305"/>
+				<order-items-system-api:delete-allitem-by-id doc:name="Delete allitem by id" doc:id="b01c03c3-ad90-4f72-bd85-a437ee7c337c" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.ID]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 			</route>
 			<route >
-				<orders-system-api:delete-order-by-id doc:name="Delete order by id" doc:id="49836f1c-723f-4570-875d-9857f715aad8" config-ref="Orders_System_API_Config" id="#[attributes.uriParams.ID]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f"/>
+				<orders-system-api:delete-order-by-id doc:name="Delete order by id" doc:id="49836f1c-723f-4570-875d-9857f715aad8" config-ref="Orders_System_API_Config" id="#[attributes.uriParams.ID]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}"/>
 			</route>
 		</scatter-gather>
 		<ee:transform doc:name="Transform Message" doc:id="80970200-59d4-4e23-a579-b571fa3e9e25" >
@@ -299,9 +295,7 @@ output application/json
 payload.order_items]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="7eec40fb-07de-4d9f-bce1-8e738236eb89" >
-			<order-items-system-api:update-orderitems doc:name="Update orderitems" doc:id="76a9fac7-eeda-4142-9406-ee9450a809c5" config-ref="Order_Items_System_API_Config" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305"/>
-		</foreach>
+		<order-items-system-api:update-allitems doc:name="Update allitems" doc:id="faef8174-504c-4564-b42a-1a82baf2237f" config-ref="Order_Items_System_API_Config" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 		<ee:transform doc:name="Transform Message" doc:id="122d30cd-7b7b-4e52-abce-04bb67c5577a" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -310,14 +304,14 @@ output application/json
 vars.order_info.order_info]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<orders-system-api:update-order-by-id doc:name="Update order by id" doc:id="07e0eb5f-b4ff-4b50-b8f9-876bef50c0c1" config-ref="Orders_System_API_Config" id="#[vars.order_info.order_info.order_id]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f"/>
+		<orders-system-api:update-order-by-id doc:name="Update order by id" doc:id="07e0eb5f-b4ff-4b50-b8f9-876bef50c0c1" config-ref="Orders_System_API_Config" id="#[vars.order_info.order_info.order_id]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 		<ee:transform doc:name="Transform Message" doc:id="02633fa1-bb16-4d26-bea7-2a3cf3d00a54" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	message: "Order Added."
+	message: "Order Appended."
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -333,7 +327,7 @@ output application/json
 payload]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="7e1bdb18-8387-4bbe-816e-d9f710bba1ae" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="b293a42021da47939c46177a9ae309dc" client-secret="300884d0db584bC7B6a821484E6CAF5f" />
+		<orders-system-api:get-order-by-id doc:name="Get order by id" doc:id="7e1bdb18-8387-4bbe-816e-d9f710bba1ae" config-ref="Orders_System_API_Config" id="#[payload.order_id]" client-id="${http.orders_config.client_id}" client-secret="${http.orders_config.client_secret}" />
 		<choice doc:name="Choice" doc:id="3710fc9d-23ef-4c95-b11f-255cc058d117" >
 			<when expression="#[sizeOf(payload) == 0]" >
 				<ee:transform doc:name="Transform Message" doc:id="142691bd-8f51-4ff0-8533-3ce4d75bbf8e" >
@@ -349,7 +343,7 @@ output application/json
 				<logger level="INFO" doc:name="Logger" doc:id="9e09aa4f-04f1-4a31-85c4-1042166ec6f2" message="#[payload]"/>
 			</when>
 			<otherwise >
-				<order-items-system-api:update-orderitems doc:name="Update orderitems" doc:id="e8a24a34-3f54-48f3-bff3-ddb259de418c" config-ref="Order_Items_System_API_Config" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305">
+				<order-items-system-api:update-orderitems doc:name="Update orderitems" doc:id="e8a24a34-3f54-48f3-bff3-ddb259de418c" config-ref="Order_Items_System_API_Config" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}">
 					<order-items-system-api:update-orderitems-request-data ><![CDATA[#[vars.item]]]></order-items-system-api:update-orderitems-request-data>
 				</order-items-system-api:update-orderitems>
 				<ee:transform doc:name="Transform Message" doc:id="cb622de9-26f9-4779-9903-cfef0679c167" >
@@ -367,11 +361,11 @@ output application/json
 		</choice>
 	</flow>
 	<flow name="getOrderIDPID" doc:id="851230d7-82ce-4adb-bdf8-97f9b0a1141e" >
-		<order-items-system-api:get-orderitem-by-id doc:name="Get orderitem by id" doc:id="0cb70b51-5da8-4628-b1ac-6335f61ff828" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.PID]" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305"/>
+		<order-items-system-api:get-orderitem-by-id doc:name="Get orderitem by id" doc:id="0cb70b51-5da8-4628-b1ac-6335f61ff828" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.PID]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 		<logger level="INFO" doc:name="Logger" doc:id="e263f5ae-10b0-4846-9831-8acbfbab0729" message="#[payload]"/>
 	</flow>
 	<flow name="deleteOrderIDPID" doc:id="653d2eb7-1aac-4c01-9608-c802433f69fd" >
-		<order-items-system-api:delete-orderitem-by-id doc:name="Delete orderitem by id" doc:id="02b4ffe6-6fef-4bb4-9169-0e54d8b5dd91" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.PID]" client-id="faf816533d73478cbb62430f1b8f8fbc" client-secret="D2A34cfB74774EfA9ae101Ace3Bd8305"/>
+		<order-items-system-api:delete-orderitem-by-id doc:name="Delete orderitem by id" doc:id="02b4ffe6-6fef-4bb4-9169-0e54d8b5dd91" config-ref="Order_Items_System_API_Config" id="#[attributes.uriParams.PID]" client-id="${http.order_item_config.client_id}" client-secret="${http.order_item_config.client_secret}"/>
 		<logger level="INFO" doc:name="Logger" doc:id="98debb6e-6fef-4326-a44d-dc8eb1dea747" message="#[payload]"/>
 	</flow>
 </mule>

@@ -1,0 +1,38 @@
+http:
+  listener:
+    host: "0.0.0.0"
+    port: "8093"
+    basepath: "/"
+    protocol: "HTTP"
+    timeout: "100000"
+  orders_config:
+    host: "0.0.0.0"
+    port: "8091"
+    basepath: "/api/"
+    protocol: "HTTP"
+    timeout: "100000"
+    client_id: "b293a42021da47939c46177a9ae309dc"
+    client_secret: "300884d0db584bC7B6a821484E6CAF5f"
+  order_item_config:
+    host: "0.0.0.0"
+    port: "8092"
+    basepath: "/api/"
+    protocol: "HTTP"
+    timeout: "100000"
+    client_id: "faf816533d73478cbb62430f1b8f8fbc"
+    client_secret: "D2A34cfB74774EfA9ae101Ace3Bd8305"
+api:
+  id: "17583151"
+  
+db:
+  host: "127.0.0.1"
+  port: "3306"
+  username: "root"
+  password: ""
+  db_name:  "orders"
+  
+email:
+  host: "smtp.gmail.com"
+  port: "587" 
+  user: "testdpdemail@gmail.com"
+  pass: "testserver"

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<configuration doc:name="Configuration" doc:id="42822416-e102-451c-81b4-8d6e00b9b248" defaultErrorHandler-ref="globalError_Handler" />
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="95dfa0a2-7038-4d52-838c-5724bdeab88e" flowRef="orders-experience-api-main" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dae00945-d3c2-4de3-9df1-d6514d659131" >
+		<http:listener-connection host="0.0.0.0" port="${http.listener.port}" />
+	</http:listener-config>
+	<email:smtp-config name="Email_SMTP1" doc:name="Email SMTP" doc:id="e0d58683-a772-4255-b1c5-c7b0659c0a19" >
+		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.user}" password="${email.pass}" />
+	</email:smtp-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="0c246dd1-0a8e-4eac-b643-9c22e8e43216" file="config.yaml" />
 	<error-handler name="globalError_Handler" doc:id="38897ccc-853a-4d06-92a7-259beb804ff2" >
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="71dc022d-a3d7-46ed-80a9-bb782b055adb" type="ORDERS-PROCESS-API:INTERNAL_SERVER_ERROR">
 			<ee:transform doc:name="Transform Message" doc:id="4a6fd662-6a5d-418e-9c73-9c1aa4e8e4b8" >

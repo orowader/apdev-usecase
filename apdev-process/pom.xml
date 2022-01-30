@@ -48,12 +48,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>de9a7ce5-d043-4057-a3c0-5e725e56e502</groupId>
-			<artifactId>mule-plugin-order-items-system-api</artifactId>
-			<version>1.0.3</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-apikit-module</artifactId>
 			<version>1.5.8</version>
@@ -66,16 +60,28 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-email-connector</artifactId>
+			<version>1.5.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-db-connector</artifactId>
+			<version>1.11.2</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
 			<groupId>de9a7ce5-d043-4057-a3c0-5e725e56e502</groupId>
 			<artifactId>orders-process-api</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.7</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-email-connector</artifactId>
-			<version>1.5.1</version>
+			<groupId>de9a7ce5-d043-4057-a3c0-5e725e56e502</groupId>
+			<artifactId>mule-plugin-order-items-system-api</artifactId>
+			<version>1.0.6</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>

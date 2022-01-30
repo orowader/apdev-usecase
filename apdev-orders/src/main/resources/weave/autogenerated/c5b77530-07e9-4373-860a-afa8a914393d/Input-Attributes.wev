@@ -1,12 +1,15 @@
 %dw 2.0
 
-type auto_9ccbb86a_fb55_440c_80e3_74acca3e06c5_Input_Attributes = {|
+type auto_c5b77530_07e9_4373_860a_afa8a914393d_Input_Attributes = {|
   clientCertificate?: {|
     publicKey?: {|  |}, 
     "type"?: String, 
     encoded?: Binary
   |}, 
-  headers: {|  |}, 
+  headers: {|
+    client_id: String, 
+    client_secret: String
+  |}, 
   listenerPath: String, 
   method: String, 
   queryParams: {|  |}, 
@@ -16,7 +19,7 @@ type auto_9ccbb86a_fb55_440c_80e3_74acca3e06c5_Input_Attributes = {|
   requestPath: String, 
   requestUri: String, 
   scheme: String, 
-  uriParams: {| ID: String |}, 
+  uriParams: {|  |}, 
   version: String, 
   localAddress: String
 |}

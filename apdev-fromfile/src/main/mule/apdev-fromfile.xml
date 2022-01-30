@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/orders-experience-api http://www.mulesoft.or
 	<file:config name="File_Config" doc:name="File Config" doc:id="039287a0-f897-4dde-9ebc-511448c93b98" >
 		<file:connection workingDir="C:\Users\orowa\Desktop\csv" />
 	</file:config>
-	<orders-experience-api:config name="Orders_Experience_API_Config" doc:name="Orders Experience API Config" doc:id="8ba8c899-38f9-4d69-b0ad-2dac95d3e1e2" property_host="127.0.0.1" property_port="8085" property_protocol="HTTP" property_client-id="b293a42021da47939c46177a9ae309dc" property_client-secret="300884d0db584bC7B6a821484E6CAF5f" property_basePath="/api/" />
+	<orders-experience-api:config name="Orders_Experience_API_Config" doc:name="Orders Experience API Config" doc:id="8ba8c899-38f9-4d69-b0ad-2dac95d3e1e2" property_host="${http.exp_config.host}" property_port="${http.exp_config.port}" property_protocol="${http.exp_config.protocol}" property_client-id="${http.exp_config.client_id}" property_client-secret="${http.exp_config.client_secret}" property_basePath="${http.exp_config.basepath}" property_responseTimeout="${http.exp_config.timeout}" property_access-token-url="${http.exp_config.token_url}"/>
 	<flow name="apdev-fromfileFlow" doc:id="7d06b7d6-102e-4093-a0f8-ace87aa77cd7" >
 		<file:listener doc:name="On New or Updated File" doc:id="bf05f0b7-94ec-4beb-80c1-44842f8c8501" config-ref="File_Config" directory="C:\Users\orowa\Desktop\csv\input" moveToDirectory="C:\Users\orowa\Desktop\csv\processed">
 			<scheduling-strategy >
